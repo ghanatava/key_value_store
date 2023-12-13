@@ -46,9 +46,28 @@ func KeyValueGetHandler(w http.ResponseWriter, r *http.Request){
 	
 }
 
+func KeyValueDeleteHandler(w http.ResponseWriter, r *http.Request){
+	vars := mux.Vars(r)
+	key := vars["key"]
+
+	_,err := Get(key)
+	if errors.Is(err,ErrorNoSuchKey){
+		http.Error(w,err.Error(),http.StatusNotFound)
+	}
+
+	Delete(key)
+
+	_,err = Get(key)
+	if !errors.Is(err,ErrorNoSuchKey){
+		http.Error(w,err.Error(),http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
 func main(){
 	r := mux.NewRouter()
 	r.HandleFunc("/v1/{key}",KeyValuePutHandler).Methods("PUT")
 	r.HandleFunc("/v1/{key}",KeyValueGetHandler).Methods("GET")
+	r.HandleFunc("/v1/{key}",KeyValueDeleteHandler).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(":8000",r))
 }
