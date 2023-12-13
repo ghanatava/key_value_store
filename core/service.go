@@ -62,6 +62,7 @@ func KeyValueDeleteHandler(w http.ResponseWriter, r *http.Request){
 		http.Error(w,err.Error(),http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
+	log.Printf("DELETE key=%s\n",key)
 }
 
 func main(){
